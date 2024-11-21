@@ -13,7 +13,7 @@ async function generateFrontContent(backContent) {
                 'Authorization': `Bearer ${CONFIG.API_KEY}`
             },
             body: JSON.stringify({
-                model: "abab6.5s-chat",
+                model: CONFIG.model,
                 messages: [
                     {role: "system", content: "你是一个语言专家，有很强的逻辑思维。"},
                     {role: "user", content: `请从下面的答案，找到关键点，生成与之对应的一个问题，问题要简短且贴近关键点:\n\n${backContent}`}
