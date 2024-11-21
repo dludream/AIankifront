@@ -1,0 +1,33 @@
+{
+    "manifest_version": 2,
+    "name": "Anki Quick Add",
+    "version": "1.0",
+    "description": "快速将选中内容添加到Anki",
+    "permissions": [
+      "activeTab",
+      "http://localhost:8765/",
+      "https://api.minimaxi.com/",
+      "storage"
+    ],
+    "browser_action": {
+      "default_popup": "popup.html"
+    },
+    "background": {
+      "scripts": ["background.js"],
+      "persistent": false
+    },
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["content.js"]
+      }
+    ],
+    "commands": {
+      "_execute_browser_action": {
+        "suggested_key": {
+          "default": "Alt+Q"
+        },
+        "description": "打开Anki Quick Add"
+      }
+    }
+  }

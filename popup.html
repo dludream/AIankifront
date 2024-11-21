@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Anki Quick Add</title>
+  <style>
+    body { 
+      width: 300px; 
+      height: 300px; 
+      padding: 10px; 
+      font-family: Arial, sans-serif;
+    }
+    select, textarea, button { 
+      width: 100%; 
+      margin-bottom: 10px; 
+    }
+    textarea {
+      font-size: 14px;  /* 设置textarea的字体大小 */
+      padding: 5px;     /* 添加一些内边距，使文字不贴边 */
+    }
+    #message {
+      display: none;
+      background-color: #4CAF50;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <div id="message"></div>
+  <select id="deckSelect"></select>
+  <textarea id="front" rows="3" placeholder="正面"></textarea>
+  <textarea id="back" rows="15" placeholder="背面"></textarea>
+  <button id="getFront">获取正面</button>
+  <button id="addNote">添加到Anki</button>
+  <script src="config.js"></script>
+  <script src="ai_service.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

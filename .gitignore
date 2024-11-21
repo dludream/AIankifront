@@ -1,0 +1,10 @@
+*.7z
+*.txt
+
+# 忽略实际的配置文件
+config.js
+
+# 其他常见的忽略项
+node_modules/
+.DS_Store
+*.log
