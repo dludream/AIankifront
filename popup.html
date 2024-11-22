@@ -30,14 +30,32 @@
       right: 0;
       z-index: 1000;
     }
+    #modelSelect {
+      margin-bottom: 10px;
+      width: 100%;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    
+    .button-group button {
+      flex: 1;
+      margin-bottom: 0;
+    }
   </style>
 </head>
 <body>
   <div id="message"></div>
   <select id="deckSelect"></select>
+  <select id="modelSelect"></select>  
   <textarea id="front" rows="3" placeholder="正面"></textarea>
   <textarea id="back" rows="15" placeholder="背面"></textarea>
-  <button id="getFront">获取正面</button>
+  <div class="button-group">
+    <button id="getFront">获取正面</button>
+    <button id="readClipboard">读剪贴板</button>
+  </div>
   <button id="addNote">添加到Anki</button>
   <script src="config.js"></script>
   <script src="ai_service.js"></script>

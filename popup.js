@@ -1,10 +1,12 @@
 // popup.js
 document.addEventListener('DOMContentLoaded', () => {
     const deckSelect = document.getElementById('deckSelect');
+    const modelSelect = document.getElementById('modelSelect');
     const frontTextarea = document.getElementById('front');
     const backTextarea = document.getElementById('back');
     const addNoteButton = document.getElementById('addNote');
     const getFrontButton = document.getElementById('getFront');
+    const readClipboardButton = document.getElementById('readClipboard');
   
     // 获取牌组列表并设置默认选中项
     chrome.runtime.sendMessage({action: "getDeckNames"}, (response) => {
@@ -39,6 +41,45 @@ document.addEventListener('DOMContentLoaded', () => {
       chrome.storage.sync.set({lastSelectedDeck: event.target.value});
     });
   
+    // 获取卡片类型列表并设置默认选中项
+    chrome.runtime.sendMessage({action: "getModelNames"}, (response) => {
+      if (response.success) {
+        // 先从存储中获取上次选择的卡片类型
+        chrome.storage.sync.get(['lastSelectedModel'], (result) => {
+          const lastSelectedModel = result.lastSelectedModel;
+          
+          response.models.forEach(model => {
+            const option = document.createElement('option');
+            option.value = option.textContent = model;
+            modelSelect.appendChild(option);
+            
+            // 如果这个卡片类型是上次选择的，就设置为选中状态
+            if (model === lastSelectedModel) {
+              option.selected = true;
+            }
+          });
+          
+          // 如果没有找到上次选择的卡片类型，默认选中Basic
+          if (!lastSelectedModel) {
+            const basicOption = Array.from(modelSelect.options)
+              .find(option => option.value === 'Basic');
+            if (basicOption) {
+              basicOption.selected = true;
+            } else if (modelSelect.options.length > 0) {
+              modelSelect.options[0].selected = true;
+            }
+          }
+        });
+      } else {
+        showMessage('获取卡片类型列表失败: ' + response.error, 'error');
+      }
+    });
+  
+    // 当卡片类型选择改变时，保存当前选择
+    modelSelect.addEventListener('change', (event) => {
+      chrome.storage.sync.set({lastSelectedModel: event.target.value});
+    });
+  
     // 获取选中的文本
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
       chrome.tabs.sendMessage(tabs[0].id, {action: "getSelectedText"}, (response) => {
@@ -60,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
     addNoteButton.addEventListener('click', async () => {
       const deck = deckSelect.value;
+      const model = modelSelect.value;  // 获取选中的卡片类型
       const front = frontTextarea.value.trim();
       let back = backTextarea.value.trim();
   
@@ -78,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
             params: {
               note: {
                 deckName: deck,
-                modelName: "Basic",
+                modelName: model,  // 使用选中的卡片类型
                 fields: {
                   Front: front,
                   Back: back
@@ -125,6 +167,45 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (error) {
         console.error('生成正面内容失败:', error);
         alert('生成正面内容失败: ' + error.message);
+      }
+    });
+  
+    readClipboardButton.addEventListener('click', async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        
+        if (!text) {
+          showMessage('剪贴板为空', 'error');
+          return;
+        }
+
+        // 将文本按行分割
+        const lines = text.trim().split('\n');
+        
+        if (lines.length === 0) {
+          showMessage('剪贴板内容为空', 'error');
+          return;
+        }
+
+        // 第一行作为正面内容
+        frontTextarea.value = lines[0].trim();
+        
+        // 剩余行作为背面内容（如果有的话）
+        if (lines.length > 1) {
+          // 在非空行末尾添加<br>标签
+          const formattedBackContent = lines.slice(1)
+            .map(line => line.trim() ? line + '<br>' : line)
+            .join('\n')
+            .trim();
+          backTextarea.value = formattedBackContent;
+        } else {
+          backTextarea.value = '';
+        }
+
+        showMessage('已读取剪贴板内容');
+      } catch (error) {
+        console.error('读取剪贴板失败:', error);
+        showMessage('读取剪贴板失败: ' + error.message, 'error');
       }
     });
   

@@ -34,10 +34,22 @@ function invokeAnkiConnect(action, params = {}) {
     return invokeAnkiConnect('deckNames');
   }
   
+  // 获取可用的卡片类型列表
+  function getModelNames() {
+    return invokeAnkiConnect('modelNames');
+  }
+  
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "getDeckNames") {
       getDeckNames().then(decks => {
         sendResponse({success: true, decks: decks});
+      }).catch(error => {
+        sendResponse({success: false, error: error.toString()});
+      });
+      return true;  // 保持消息通道开放以进行异步响应
+    } else if (request.action === "getModelNames") {
+      getModelNames().then(models => {
+        sendResponse({success: true, models: models});
       }).catch(error => {
         sendResponse({success: false, error: error.toString()});
       });
