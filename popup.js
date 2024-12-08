@@ -187,6 +187,15 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
+        // 设置卡片类型为 basicMarkdown
+        const basicMarkdownOption = Array.from(modelSelect.options)
+          .find(option => option.value === 'basicMarkdown');
+        if (basicMarkdownOption) {
+          basicMarkdownOption.selected = true;
+          // 保存选择到存储
+          chrome.storage.sync.set({lastSelectedModel: 'basicMarkdown'});
+        }
+
         // 第一行作为正面内容
         frontTextarea.value = lines[0].trim();
         
